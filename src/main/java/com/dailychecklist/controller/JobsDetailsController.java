@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dailychecklist.entity.JobsDetails;
 import com.dailychecklist.service.ExcelDownloadService;
 import com.dailychecklist.service.JobsDetailsService;
+import com.dailychecklist.service.LoginService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,9 @@ public class JobsDetailsController {
 
 	@Autowired
 	private ExcelDownloadService excelDownloadService;
+
+	@Autowired
+	private LoginService loginService;
 
 	@PostMapping("upload-jobs-details")
 	public ResponseEntity<?> uploadJobsDetails(@RequestParam("file") MultipartFile file) throws IOException {
@@ -53,4 +57,21 @@ public class JobsDetailsController {
 		response.setHeader(headerKey, headerValue);
 		excelDownloadService.generateExcel(response);
 	}
+
+	// Request links for login/sign-up
+
+	@PostMapping("sign-up")
+	public ResponseEntity<?> addNewUserDetails(@RequestParam("email") String emailAddr,
+			@RequestParam("userName") String userName, @RequestParam("password") String password) {
+		this.loginService.saveNewUserDetails(emailAddr, userName, password);
+		return ResponseEntity.ok(Map.of("Message", loginService.responseMessage));
+	}
+
+	@PostMapping("login")
+	public ResponseEntity<?> loginUser(@RequestParam("userName") String userName,
+			@RequestParam("password") String password) {
+		this.loginService.loginUser(userName, password);
+		return ResponseEntity.ok(Map.of("Message", loginService.responseMessage));
+	}
+
 }
